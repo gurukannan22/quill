@@ -72,7 +72,7 @@ export function ProfileList({ onCreateClick, onEditClick, onSettingsClick, onFil
     return (
       <div className="p-4 space-y-3 animate-pulse">
         {[1, 2].map(i => (
-          <div key={i} className="h-[60px] bg-quill-dark-700 rounded-2xl overflow-hidden relative">
+          <div key={i} className="h-[60px] bg-quill-dark-700 rounded-[20px] overflow-hidden relative">
             <div className="absolute inset-0 bg-shimmer-gradient bg-[length:200%_100%] animate-shimmer" />
           </div>
         ))}
@@ -87,7 +87,7 @@ export function ProfileList({ onCreateClick, onEditClick, onSettingsClick, onFil
       <header className="flex items-center justify-between px-4 pt-4 pb-3">
         <div className="flex items-center gap-2.5">
           {/* Logo */}
-          <div className="relative w-7 h-7 bg-gradient-to-br from-quill-purple-500 to-violet-600 rounded-lg flex items-center justify-center shadow-lg shadow-quill-purple-900/50">
+          <div className="relative w-8 h-8 bg-gradient-to-br from-quill-purple-500 to-violet-600 rounded-[14px] flex items-center justify-center shadow-lg shadow-quill-purple-900/50">
             <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
               <path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z" />
               <line x1="16" y1="8" x2="2" y2="22" />
@@ -100,13 +100,13 @@ export function ProfileList({ onCreateClick, onEditClick, onSettingsClick, onFil
         <div className="flex items-center gap-1">
           <button
             onClick={onSettingsClick}
-            className="p-1.5 text-slate-500 hover:text-slate-300 hover:bg-white/6 rounded-lg transition-all duration-150"
+            className="p-1.5 text-slate-500 hover:text-slate-300 hover:bg-white/6 rounded-[12px] transition-all duration-150"
           >
             <Settings size={16} />
           </button>
           <button
             onClick={onCreateClick}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 bg-quill-purple-600/20 hover:bg-quill-purple-600/30 text-quill-purple-400 hover:text-quill-purple-300 rounded-lg text-xs font-semibold transition-all duration-150"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-quill-purple-600/20 hover:bg-quill-purple-600/30 text-quill-purple-400 hover:text-quill-purple-300 rounded-[12px] text-xs font-semibold transition-all duration-150"
           >
             <Plus size={14} strokeWidth={2.5} />
             New
@@ -148,7 +148,7 @@ export function ProfileList({ onCreateClick, onEditClick, onSettingsClick, onFil
           <button
             onClick={handleFill}
             disabled={!activeId || filling}
-            className="w-full relative flex items-center justify-center gap-2 py-3 px-4 rounded-2xl font-semibold text-sm transition-all duration-200 active:scale-[0.97] disabled:opacity-40 disabled:pointer-events-none overflow-hidden group"
+            className="w-full relative flex items-center justify-center gap-2 py-3 px-4 rounded-[20px] font-semibold text-sm transition-all duration-200 active:scale-[0.97] disabled:opacity-40 disabled:pointer-events-none overflow-hidden group"
             style={{
               background: 'linear-gradient(135deg, #534AB7 0%, #7F77DD 50%, #9B8EE8 100%)',
               boxShadow: '0 4px 24px rgba(127, 119, 221, 0.35)',

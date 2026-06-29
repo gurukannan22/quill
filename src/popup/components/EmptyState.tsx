@@ -11,7 +11,7 @@ export function EmptyState({ onCreateClick }: Props) {
       {/* Glowing orb */}
       <div className="relative mb-6">
         <div className="absolute inset-0 bg-quill-purple-600/30 rounded-full blur-xl scale-150" />
-        <div className="relative w-16 h-16 bg-gradient-to-br from-quill-purple-500 to-violet-600 rounded-2xl flex items-center justify-center shadow-xl shadow-quill-purple-900/40">
+        <div className="relative w-16 h-16 bg-gradient-to-br from-quill-purple-500 to-violet-600 rounded-[24px] flex items-center justify-center shadow-xl shadow-quill-purple-900/40">
           <Sparkles size={28} className="text-white" strokeWidth={1.5} />
         </div>
       </div>
@@ -23,7 +23,7 @@ export function EmptyState({ onCreateClick }: Props) {
 
       <button
         onClick={onCreateClick}
-        className="px-5 py-2.5 bg-gradient-to-r from-quill-purple-600 to-violet-600 text-white rounded-xl text-sm font-semibold hover:from-quill-purple-500 hover:to-violet-500 transition-all duration-200 active:scale-95 shadow-lg shadow-quill-purple-900/40"
+        className="px-5 py-2.5 bg-gradient-to-r from-quill-purple-600 to-violet-600 text-white rounded-[16px] text-sm font-semibold hover:from-quill-purple-500 hover:to-violet-500 transition-all duration-200 active:scale-95 shadow-lg shadow-quill-purple-900/40"
       >
         Create first profile
       </button>

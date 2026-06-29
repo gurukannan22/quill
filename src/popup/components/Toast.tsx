@@ -55,7 +55,7 @@ export function Toast({ toast, onDismiss }: Props) {
   return (
     <div
       className={`
-        relative flex items-start gap-3 px-3 py-2.5 rounded-xl border text-sm overflow-hidden shadow-xl
+        relative flex items-start gap-3 px-3 py-2.5 rounded-[18px] border text-sm overflow-hidden shadow-xl
         ${cfg.containerClass}
         ${isLeaving ? 'opacity-0 translate-y-[-4px] transition-all duration-250' : 'animate-slideDown'}
       `}
@@ -74,7 +74,7 @@ export function Toast({ toast, onDismiss }: Props) {
         {toast.onUndo && (
           <button
             onClick={() => { toast.onUndo?.(); dismiss(); }}
-            className="flex items-center gap-1 text-[11px] font-semibold text-quill-purple-400 hover:text-quill-purple-300 bg-quill-purple-500/10 hover:bg-quill-purple-500/20 px-2 py-1 rounded-lg transition-all"
+            className="flex items-center gap-1 text-[11px] font-semibold text-quill-purple-400 hover:text-quill-purple-300 bg-quill-purple-500/10 hover:bg-quill-purple-500/20 px-2 py-1 rounded-[10px] transition-all"
           >
             <RotateCcw size={11} />
             Undo

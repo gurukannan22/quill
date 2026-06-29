@@ -34,7 +34,7 @@ export function ProfileCard({ profile, isSelected, onClick, onEdit }: Props) {
     <div
       onClick={onClick}
       className={clsx(
-        'group relative flex items-center gap-3 p-3 rounded-2xl cursor-pointer transition-all duration-200',
+        'group relative flex items-center gap-3 p-3 rounded-[20px] cursor-pointer transition-all duration-200',
         isSelected
           ? `bg-quill-dark-700 ring-1 ${colors.ring} shadow-lg ${colors.glow}`
           : 'hover:bg-quill-dark-700/60 active:bg-quill-dark-700'
@@ -42,7 +42,7 @@ export function ProfileCard({ profile, isSelected, onClick, onEdit }: Props) {
     >
       {/* Icon Badge */}
       <div className={clsx(
-        'flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br text-white shadow-md',
+        'flex-shrink-0 w-11 h-11 rounded-[16px] flex items-center justify-center bg-gradient-to-br text-white shadow-md',
         colors.accent,
         isSelected && `shadow-lg ${colors.glow}`
       )}>
@@ -66,10 +66,10 @@ export function ProfileCard({ profile, isSelected, onClick, onEdit }: Props) {
           e.stopPropagation();
           onEdit();
         }}
-        className="flex-shrink-0 p-1.5 rounded-lg text-slate-600 hover:text-slate-300 hover:bg-white/10 opacity-0 group-hover:opacity-100 transition-all duration-150"
+        className="flex-shrink-0 p-2 rounded-xl text-slate-600 hover:text-slate-300 hover:bg-white/10 opacity-0 group-hover:opacity-100 transition-all duration-150"
         title="Edit profile"
       >
-        <ChevronRight size={15} />
+        <ChevronRight size={16} />
       </button>
     </div>
   );

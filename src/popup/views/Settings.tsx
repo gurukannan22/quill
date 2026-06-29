@@ -86,7 +86,7 @@ export function Settings({ onBack, onToast }: Props) {
       <header className="flex items-center gap-2 px-3 pt-4 pb-3 sticky top-0 bg-quill-dark-900 z-10">
         <button
           onClick={onBack}
-          className="p-1.5 text-slate-500 hover:text-slate-200 hover:bg-white/6 rounded-lg transition-all"
+          className="p-1.5 text-slate-500 hover:text-slate-200 hover:bg-white/6 rounded-[12px] transition-all"
         >
           <ArrowLeft size={18} />
         </button>
@@ -98,7 +98,7 @@ export function Settings({ onBack, onToast }: Props) {
         {/* Preferences */}
         <section>
           <SectionLabel>Preferences</SectionLabel>
-          <div className="bg-quill-dark-700 rounded-2xl border border-white/6 overflow-hidden divide-y divide-white/5">
+          <div className="bg-quill-dark-700 rounded-[20px] border border-white/6 overflow-hidden divide-y divide-white/5">
             <SettingRow
               icon={<Highlighter size={15} />}
               label="Highlight filled fields"
@@ -142,7 +142,7 @@ export function Settings({ onBack, onToast }: Props) {
           <SectionLabel className="text-red-500/70">Danger zone</SectionLabel>
           <button
             onClick={handleDeleteAll}
-            className="w-full flex items-center justify-center gap-2 px-3 py-3 text-sm font-semibold text-red-400 bg-red-500/8 hover:bg-red-500/15 border border-red-500/15 rounded-2xl transition-all"
+            className="w-full flex items-center justify-center gap-2 px-3 py-3 text-sm font-semibold text-red-400 bg-red-500/8 hover:bg-red-500/15 border border-red-500/15 rounded-[18px] transition-all"
           >
             <AlertTriangle size={15} />
             Delete all profiles
@@ -188,7 +188,7 @@ function ActionButton({ icon, children, onClick }: { icon: React.ReactNode; chil
   return (
     <button
       onClick={onClick}
-      className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-300 bg-quill-dark-700 hover:bg-quill-dark-600 border border-white/6 rounded-2xl transition-all group"
+      className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-300 bg-quill-dark-700 hover:bg-quill-dark-600 border border-white/6 rounded-[18px] transition-all group"
     >
       <span className="text-slate-500 group-hover:text-slate-400 transition-colors">{icon}</span>
       <span className="flex-1 text-left">{children}</span>

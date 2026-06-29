@@ -105,7 +105,7 @@ export function ProfileEditor({ profileId, onBack, onSave }: Props) {
       <header className="flex items-center gap-2 px-3 pt-4 pb-3 sticky top-0 bg-quill-dark-900 z-10">
         <button
           onClick={onBack}
-          className="p-1.5 text-slate-500 hover:text-slate-200 hover:bg-white/6 rounded-lg transition-all"
+          className="p-1.5 text-slate-500 hover:text-slate-200 hover:bg-white/6 rounded-[12px] transition-all"
         >
           <ArrowLeft size={18} />
         </button>
@@ -118,17 +118,17 @@ export function ProfileEditor({ profileId, onBack, onSave }: Props) {
       <main className="flex-1 overflow-y-auto scrollbar-hide px-4 pb-24">
 
         {error && (
-          <div className="mb-4 px-3 py-2.5 bg-red-500/10 border border-red-500/20 text-red-400 text-xs rounded-xl">
+          <div className="mb-4 px-3 py-2.5 bg-red-500/10 border border-red-500/20 text-red-400 text-xs rounded-[16px]">
             {error}
           </div>
         )}
 
         {/* Profile identity card */}
-        <div className="mb-6 p-4 bg-quill-dark-700 rounded-2xl border border-white/6">
+        <div className="mb-6 p-4 bg-quill-dark-700 rounded-[20px] border border-white/6">
           <div className="flex items-center gap-4 mb-4">
             {/* Avatar preview */}
             <div className={clsx(
-              'w-14 h-14 rounded-2xl bg-gradient-to-br flex items-center justify-center text-white shadow-xl flex-shrink-0',
+              'w-14 h-14 rounded-[18px] bg-gradient-to-br flex items-center justify-center text-white shadow-xl flex-shrink-0',
               COLOR_SOLID[selectedColor]
             )}>
               <SelectedIconCmp size={24} strokeWidth={1.8} />
@@ -154,7 +154,7 @@ export function ProfileEditor({ profileId, onBack, onSave }: Props) {
                   key={id}
                   onClick={() => setProfile(p => ({ ...p, icon: id }))}
                   className={clsx(
-                    'w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-150',
+                    'w-9 h-9 rounded-[12px] flex items-center justify-center transition-all duration-150',
                     profile.icon === id
                       ? `bg-gradient-to-br ${COLOR_SOLID[selectedColor]} text-white shadow-md`
                       : 'bg-quill-dark-600 text-slate-500 hover:text-slate-300 hover:bg-quill-dark-500'
@@ -220,7 +220,7 @@ export function ProfileEditor({ profileId, onBack, onSave }: Props) {
         {profileId && (
           <button
             onClick={handleDelete}
-            className="p-3 text-red-500 hover:text-red-400 bg-red-500/10 hover:bg-red-500/15 rounded-xl transition-all"
+            className="p-3 text-red-500 hover:text-red-400 bg-red-500/10 hover:bg-red-500/15 rounded-[16px] transition-all"
             title="Delete profile"
           >
             <Trash2 size={18} />
@@ -229,7 +229,7 @@ export function ProfileEditor({ profileId, onBack, onSave }: Props) {
         <button
           onClick={handleSave}
           disabled={saving}
-          className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-2xl font-semibold text-sm text-white transition-all active:scale-[0.97] disabled:opacity-50"
+          className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-[20px] font-semibold text-sm text-white transition-all active:scale-[0.97] disabled:opacity-50"
           style={{
             background: 'linear-gradient(135deg, #534AB7 0%, #7F77DD 50%, #9B8EE8 100%)',
             boxShadow: '0 4px 20px rgba(127, 119, 221, 0.3)',
