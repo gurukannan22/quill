@@ -152,7 +152,7 @@ export function Settings({ onBack, onToast }: Props) {
         {/* Footer */}
         <footer className="mt-8 text-center text-xs font-medium text-slate-500">
         <p className="mb-1">Quill Extension v0.1.0</p>
-        <p>Made with &lt;3 by gurukannan22</p>
+        <p>Made with ❤️ by gurukannan22</p>
       </footer>
       </main>
     </div>

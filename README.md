@@ -58,5 +58,5 @@ Then load the `dist/` directory into Chrome using the **Load unpacked** method d
 ---
 
 <div align="center">
-  Made with &lt;3 by gurukannan22
+  Made with ❤️ by gurukannan22
 </div>

@@ -87,13 +87,7 @@ export function ProfileList({ onCreateClick, onEditClick, onSettingsClick, onFil
       <header className="flex items-center justify-between px-4 pt-4 pb-3">
         <div className="flex items-center gap-2.5">
           {/* Logo */}
-          <div className="relative w-8 h-8 bg-gradient-to-br from-quill-purple-500 to-violet-600 rounded-[14px] flex items-center justify-center shadow-lg shadow-quill-purple-900/50">
-            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
-              <path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z" />
-              <line x1="16" y1="8" x2="2" y2="22" />
-              <line x1="17.5" y1="15" x2="9" y2="6.5" />
-            </svg>
-          </div>
+          <img src="/icons/icon-48.png" className="w-8 h-8 rounded-[14px] shadow-lg shadow-quill-purple-900/50" alt="Quill Logo" />
           <span className="font-bold text-slate-100 tracking-tight">Quill</span>
         </div>
 

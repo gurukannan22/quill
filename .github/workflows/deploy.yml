@@ -58,7 +58,8 @@ jobs:
           cp quill-extension.crx gh-pages-site/
           # Copy the template index.html to the site directory
           cp scripts/github-pages.html gh-pages-site/index.html
-          # Copy changelog and versions
+          # Copy icon
+          cp public/icons/icon-128.png gh-pages-site/icon.png || true
           cp CHANGELOG.md gh-pages-site/ || true
           cp versions.txt gh-pages-site/ || true
           
