@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { ProfileList } from './views/ProfileList';
 import { ProfileEditor } from './views/ProfileEditor';
 import { Settings } from './views/Settings';
@@ -12,59 +12,55 @@ export default function App() {
   const [editProfileId, setEditProfileId] = useState<string | undefined>();
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
 
-  const addToast = (title: string, message?: string, type: 'success' | 'error' | 'info' = 'info', onUndo?: () => void) => {
+  const addToast = (
+    title: string,
+    message?: string,
+    type: ToastMessage['type'] = 'info',
+    onUndo?: () => void
+  ) => {
     const id = nanoid();
     setToasts(prev => [...prev, { id, title, message, type, onUndo }]);
   };
 
-  const removeToast = (id: string) => {
-    setToasts(prev => prev.filter(t => t.id !== id));
-  };
+  const removeToast = (id: string) => setToasts(prev => prev.filter(t => t.id !== id));
 
   const handleFillSuccess = (filled: number, skipped: number) => {
     if (filled > 0) {
-      const msg = skipped > 0 ? `Filled ${filled} of ${filled + skipped} fields` : '';
-      
       const handleUndo = async () => {
         try {
           await chrome.runtime.sendMessage({ type: 'UNDO_FILL' });
-          addToast('Form fill undone', undefined, 'info');
-        } catch (e) {
-          console.error(e);
-        }
+          addToast('Fill undone', undefined, 'info');
+        } catch {}
       };
-
-      addToast(`Filled ${filled} ${filled === 1 ? 'field' : 'fields'}`, msg, 'success', handleUndo);
+      const secondary = skipped > 0 ? `${skipped} field${skipped > 1 ? 's' : ''} skipped (no matching data)` : undefined;
+      addToast(`Filled ${filled} ${filled === 1 ? 'field' : 'fields'}`, secondary, 'success', handleUndo);
     } else {
-      addToast('No fields filled', 'Form not found on this page or no matching fields.', 'info');
+      addToast('No fields filled', 'No matching form found on this page.', 'info');
     }
   };
 
   return (
-    <div className="h-screen flex flex-col relative bg-slate-50">
-      <div className="absolute top-2 left-2 right-2 z-50 flex flex-col gap-2">
+    <div className="relative bg-quill-dark-900" style={{ width: 320, minHeight: 200, maxHeight: 600 }}>
+      {/* Toast stack */}
+      <div className="absolute top-2 left-2 right-2 z-50 flex flex-col gap-1.5 pointer-events-none">
         {toasts.map(toast => (
-          <Toast key={toast.id} toast={toast} onDismiss={removeToast} />
+          <div key={toast.id} className="pointer-events-auto">
+            <Toast toast={toast} onDismiss={removeToast} />
+          </div>
         ))}
       </div>
 
-      <div className="flex-1 overflow-hidden">
+      {/* Views */}
+      <div style={{ height: 580 }} className="overflow-hidden">
         {view === 'list' && (
           <ProfileList
-            onCreateClick={() => {
-              setEditProfileId(undefined);
-              setView('editor');
-            }}
-            onEditClick={(id) => {
-              setEditProfileId(id);
-              setView('editor');
-            }}
+            onCreateClick={() => { setEditProfileId(undefined); setView('editor'); }}
+            onEditClick={(id) => { setEditProfileId(id); setView('editor'); }}
             onSettingsClick={() => setView('settings')}
             onFillSuccess={handleFillSuccess}
             onUndoAvailable={() => {}}
           />
         )}
-
         {view === 'editor' && (
           <ProfileEditor
             profileId={editProfileId}
@@ -72,7 +68,6 @@ export default function App() {
             onSave={() => setView('list')}
           />
         )}
-
         {view === 'settings' && (
           <Settings
             onBack={() => setView('list')}

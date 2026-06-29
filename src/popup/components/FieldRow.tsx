@@ -10,8 +10,8 @@ interface Props {
 
 export function FieldRow({ label, value, onChange, type = 'text', placeholder }: Props) {
   return (
-    <div className="flex flex-col gap-1 mb-3">
-      <label className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold pl-1">
+    <div className="flex flex-col gap-1.5 mb-3">
+      <label className="text-[10px] uppercase tracking-widest text-slate-500 font-semibold pl-0.5">
         {label}
       </label>
       <input
@@ -19,7 +19,7 @@ export function FieldRow({ label, value, onChange, type = 'text', placeholder }:
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-quill-purple-400 focus:border-transparent transition-shadow"
+        className="w-full px-3 py-2 bg-quill-dark-700 border border-white/8 rounded-xl text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none focus:ring-1 focus:ring-quill-purple-500/60 focus:border-quill-purple-500/40 transition-all duration-150"
       />
     </div>
   );

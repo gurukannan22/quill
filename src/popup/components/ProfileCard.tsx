@@ -1,15 +1,14 @@
 import React from 'react';
 import type { Profile, ProfileColor } from '../../storage/types';
-import { User, Building, Briefcase, GraduationCap, Heart, CheckCircle2 } from 'lucide-react';
+import { User, Building, Briefcase, GraduationCap, Heart, ChevronRight } from 'lucide-react';
 import { clsx } from 'clsx';
-import { twMerge } from 'tailwind-merge';
 
-export const COLOR_MAP: Record<ProfileColor, { bg: string; text: string; border: string }> = {
-  blue:   { bg: 'bg-blue-50',   text: 'text-blue-700',   border: 'border-blue-300' },
-  purple: { bg: 'bg-violet-50', text: 'text-violet-700', border: 'border-violet-300' },
-  amber:  { bg: 'bg-amber-50',  text: 'text-amber-700',  border: 'border-amber-300' },
-  green:  { bg: 'bg-emerald-50',text: 'text-emerald-700',border: 'border-emerald-300' },
-  pink:   { bg: 'bg-pink-50',   text: 'text-pink-700',   border: 'border-pink-300' },
+export const COLOR_MAP: Record<ProfileColor, { accent: string; glow: string; ring: string; dot: string }> = {
+  blue:   { accent: 'from-blue-500 to-cyan-500',    glow: 'shadow-blue-500/20',   ring: 'ring-blue-500/40',   dot: 'bg-blue-400' },
+  purple: { accent: 'from-violet-500 to-purple-500', glow: 'shadow-violet-500/20', ring: 'ring-violet-500/40', dot: 'bg-violet-400' },
+  amber:  { accent: 'from-amber-500 to-orange-500',  glow: 'shadow-amber-500/20',  ring: 'ring-amber-500/40',  dot: 'bg-amber-400' },
+  green:  { accent: 'from-emerald-500 to-teal-500',  glow: 'shadow-emerald-500/20',ring: 'ring-emerald-500/40',dot: 'bg-emerald-400' },
+  pink:   { accent: 'from-pink-500 to-rose-500',     glow: 'shadow-pink-500/20',   ring: 'ring-pink-500/40',   dot: 'bg-pink-400' },
 };
 
 const IconMap = {
@@ -34,35 +33,43 @@ export function ProfileCard({ profile, isSelected, onClick, onEdit }: Props) {
   return (
     <div
       onClick={onClick}
-      className={twMerge(
-        'relative flex items-center p-3 rounded-xl border transition-all duration-150 cursor-pointer',
-        isSelected 
-          ? `border-quill-purple-400 bg-quill-purple-50 shadow-sm ring-1 ring-quill-purple-400`
-          : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+      className={clsx(
+        'group relative flex items-center gap-3 p-3 rounded-2xl cursor-pointer transition-all duration-200',
+        isSelected
+          ? `bg-quill-dark-700 ring-1 ${colors.ring} shadow-lg ${colors.glow}`
+          : 'hover:bg-quill-dark-700/60 active:bg-quill-dark-700'
       )}
     >
-      <div className={clsx('flex-shrink-0 p-2 rounded-lg', colors.bg, colors.text)}>
-        <Icon size={20} />
+      {/* Icon Badge */}
+      <div className={clsx(
+        'flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br text-white shadow-md',
+        colors.accent,
+        isSelected && `shadow-lg ${colors.glow}`
+      )}>
+        <Icon size={18} strokeWidth={2} />
       </div>
-      
-      <div className="ml-3 flex-1 min-w-0">
-        <div className="flex items-center justify-between">
-          <h3 className="text-sm font-medium text-slate-900 truncate pr-2">{profile.name}</h3>
-          {isSelected && <CheckCircle2 size={16} className="text-quill-purple-600 flex-shrink-0" />}
+
+      {/* Info */}
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2">
+          {isSelected && <span className={clsx('w-1.5 h-1.5 rounded-full flex-shrink-0', colors.dot)} />}
+          <h3 className="text-sm font-semibold text-slate-100 truncate">{profile.name}</h3>
         </div>
         <p className="text-xs text-slate-500 truncate mt-0.5">
-          {profile.fields.email || profile.fields.phone || 'No contact info'}
+          {profile.fields.email || profile.fields.phone || profile.fields.company || 'No details added'}
         </p>
       </div>
 
-      <button 
+      {/* Edit button — visible on hover */}
+      <button
         onClick={(e) => {
           e.stopPropagation();
           onEdit();
         }}
-        className="absolute inset-y-0 right-0 px-3 hidden group-hover:flex items-center text-slate-400 hover:text-slate-600"
+        className="flex-shrink-0 p-1.5 rounded-lg text-slate-600 hover:text-slate-300 hover:bg-white/10 opacity-0 group-hover:opacity-100 transition-all duration-150"
+        title="Edit profile"
       >
-        Edit
+        <ChevronRight size={15} />
       </button>
     </div>
   );

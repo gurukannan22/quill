@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Profile, StorageSchema } from '../../storage/types';
-import { getProfiles, setActiveProfileId, getData } from '../../storage/profiles';
+import { setActiveProfileId, getData } from '../../storage/profiles';
 import { ProfileCard } from '../components/ProfileCard';
 import { EmptyState } from '../components/EmptyState';
 import { Settings, Plus, Zap } from 'lucide-react';
@@ -18,6 +18,7 @@ export function ProfileList({ onCreateClick, onEditClick, onSettingsClick, onFil
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [filling, setFilling] = useState(false);
   const [detectedFields, setDetectedFields] = useState<DetectedField[]>([]);
   const [showCount, setShowCount] = useState(true);
 
@@ -29,17 +30,13 @@ export function ProfileList({ onCreateClick, onEditClick, onSettingsClick, onFil
       setLoading(false);
     });
 
-    // Ask content script how many fields are detected
     chrome.runtime.sendMessage({ type: 'DETECT_FIELDS' })
       .then(response => {
         if (response?.type === 'FIELDS_DETECTED') {
           setDetectedFields(response.payload || []);
         }
       })
-      .catch(() => {
-        // Content script might not be injected (e.g. extension just installed, page not refreshed)
-        setDetectedFields([]);
-      });
+      .catch(() => setDetectedFields([]));
   }, []);
 
   const handleSelect = async (id: string) => {
@@ -48,71 +45,90 @@ export function ProfileList({ onCreateClick, onEditClick, onSettingsClick, onFil
   };
 
   const handleFill = async () => {
-    if (!activeId) return;
-    
+    if (!activeId || filling) return;
+    setFilling(true);
     try {
-      const response = await chrome.runtime.sendMessage({ 
-        type: 'FILL_FORM', 
-        payload: { profileId: activeId } 
+      const response = await chrome.runtime.sendMessage({
+        type: 'FILL_FORM',
+        payload: { profileId: activeId }
       });
-      
       if (response?.type === 'FILL_RESULT') {
         const { filled, skipped } = response.payload;
         onFillSuccess(filled, skipped);
-        if (filled > 0) {
-          onUndoAvailable();
-        }
+        if (filled > 0) onUndoAvailable();
       }
     } catch (e) {
-      console.error(e);
-      // Fail gracefully
       onFillSuccess(0, 0);
+    } finally {
+      setFilling(false);
     }
   };
 
   const activeProfile = profiles.find(p => p.id === activeId);
+  const fieldCount = detectedFields.length;
 
+  /* ──────── Loading skeleton ──────── */
   if (loading) {
     return (
       <div className="p-4 space-y-3 animate-pulse">
-        <div className="h-16 bg-slate-100 rounded-xl w-full"></div>
-        <div className="h-16 bg-slate-100 rounded-xl w-full"></div>
+        {[1, 2].map(i => (
+          <div key={i} className="h-[60px] bg-quill-dark-700 rounded-2xl overflow-hidden relative">
+            <div className="absolute inset-0 bg-shimmer-gradient bg-[length:200%_100%] animate-shimmer" />
+          </div>
+        ))}
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col h-full bg-white relative">
-      <header className="flex items-center justify-between px-4 py-3 border-b border-slate-100 bg-white sticky top-0 z-10">
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 bg-quill-purple-600 rounded-md flex items-center justify-center">
-             {/* Simple feather representation */}
-            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
-              <path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"></path>
-              <line x1="16" y1="8" x2="2" y2="22"></line>
-              <line x1="17.5" y1="15" x2="9" y2="6.5"></line>
+    <div className="flex flex-col h-full bg-quill-dark-900">
+
+      {/* ── Header ── */}
+      <header className="flex items-center justify-between px-4 pt-4 pb-3">
+        <div className="flex items-center gap-2.5">
+          {/* Logo */}
+          <div className="relative w-7 h-7 bg-gradient-to-br from-quill-purple-500 to-violet-600 rounded-lg flex items-center justify-center shadow-lg shadow-quill-purple-900/50">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+              <path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z" />
+              <line x1="16" y1="8" x2="2" y2="22" />
+              <line x1="17.5" y1="15" x2="9" y2="6.5" />
             </svg>
           </div>
-          <h1 className="font-semibold text-slate-900">Quill</h1>
+          <span className="font-bold text-slate-100 tracking-tight">Quill</span>
         </div>
+
         <div className="flex items-center gap-1">
-          <button onClick={onSettingsClick} className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors">
-            <Settings size={18} />
+          <button
+            onClick={onSettingsClick}
+            className="p-1.5 text-slate-500 hover:text-slate-300 hover:bg-white/6 rounded-lg transition-all duration-150"
+          >
+            <Settings size={16} />
           </button>
-          <button onClick={onCreateClick} className="p-1.5 text-slate-400 hover:text-quill-purple-600 hover:bg-quill-purple-50 rounded-lg transition-colors">
-            <Plus size={20} />
+          <button
+            onClick={onCreateClick}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 bg-quill-purple-600/20 hover:bg-quill-purple-600/30 text-quill-purple-400 hover:text-quill-purple-300 rounded-lg text-xs font-semibold transition-all duration-150"
+          >
+            <Plus size={14} strokeWidth={2.5} />
+            New
           </button>
         </div>
       </header>
 
-      <main className="flex-1 overflow-y-auto p-4 pb-24">
+      {/* ── Profile count badge ── */}
+      {profiles.length > 0 && (
+        <div className="px-4 mb-1">
+          <p className="text-[10px] uppercase tracking-widest text-slate-600 font-semibold">
+            {profiles.length} {profiles.length === 1 ? 'Profile' : 'Profiles'}
+          </p>
+        </div>
+      )}
+
+      {/* ── Main content ── */}
+      <main className="flex-1 overflow-y-auto scrollbar-hide px-3 pb-28">
         {profiles.length === 0 ? (
           <EmptyState onCreateClick={onCreateClick} />
         ) : (
-          <div className="space-y-2">
-            <h2 className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold mb-3 px-1">
-              Your profiles
-            </h2>
+          <div className="space-y-1 py-1">
             {profiles.map(profile => (
               <ProfileCard
                 key={profile.id}
@@ -126,22 +142,38 @@ export function ProfileList({ onCreateClick, onEditClick, onSettingsClick, onFil
         )}
       </main>
 
+      {/* ── Fill CTA footer ── */}
       {profiles.length > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 p-4 bg-white/80 backdrop-blur-md border-t border-slate-100">
+        <div className="fixed bottom-0 left-0 right-0 px-3 pb-3 pt-2 bg-gradient-to-t from-quill-dark-900 via-quill-dark-900/95 to-transparent">
           <button
             onClick={handleFill}
-            disabled={!activeId}
-            className="w-full flex items-center justify-center gap-2 bg-slate-900 text-white py-2.5 px-4 rounded-xl font-medium hover:bg-slate-800 transition-colors active:scale-95 disabled:opacity-50 disabled:pointer-events-none"
+            disabled={!activeId || filling}
+            className="w-full relative flex items-center justify-center gap-2 py-3 px-4 rounded-2xl font-semibold text-sm transition-all duration-200 active:scale-[0.97] disabled:opacity-40 disabled:pointer-events-none overflow-hidden group"
+            style={{
+              background: 'linear-gradient(135deg, #534AB7 0%, #7F77DD 50%, #9B8EE8 100%)',
+              boxShadow: '0 4px 24px rgba(127, 119, 221, 0.35)',
+            }}
           >
-            <Zap size={16} className="text-amber-400 fill-amber-400" />
-            Fill form with {activeProfile?.name || '...'}
+            {/* Shimmer overlay on hover */}
+            <div className="absolute inset-0 bg-white/0 group-hover:bg-white/8 transition-all duration-200" />
+            <Zap
+              size={16}
+              className={`text-amber-300 fill-amber-300 relative z-10 ${filling ? 'animate-pulse' : ''}`}
+            />
+            <span className="relative z-10 text-white">
+              {filling ? 'Filling…' : `Fill with ${activeProfile?.name || '…'}`}
+            </span>
           </button>
-          
+
           {showCount && (
-            <p className="text-center text-[11px] text-slate-400 mt-2">
-              {detectedFields.length > 0 
-                ? `📋 ${detectedFields.length} fields detected` 
-                : 'No form detected on this page'}
+            <p className="text-center text-[11px] mt-2 font-medium">
+              {fieldCount > 0 ? (
+                <span className="text-quill-purple-400">
+                  ✦ {fieldCount} {fieldCount === 1 ? 'field' : 'fields'} detected
+                </span>
+              ) : (
+                <span className="text-slate-600">No form detected on this page</span>
+              )}
             </p>
           )}
         </div>
