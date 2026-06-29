@@ -3,115 +3,300 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quill Extension</title>
+    <title>Quill — Smart Form Filler</title>
+    <meta name="description" content="Save your personal data securely on-device and fill any web form in one click using smart heuristics. No cloud, no accounts.">
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script>
       tailwind.config = {
         theme: {
           extend: {
-            fontFamily: {
-              sans: ['Inter', 'sans-serif'],
-            },
+            fontFamily: { sans: ['Inter', 'sans-serif'] },
             colors: {
               quill: {
-                dark: '#0f0f13',
-                card: '#16161d',
+                dark: '#0a0a10',
+                card: '#13131a',
+                border: 'rgba(255,255,255,0.07)',
                 purple: '#6B63D4',
-                purpleHover: '#7F77DD'
+                'purple-hover': '#7F77DD',
+                'purple-light': '#9B8EE8',
               }
+            },
+            animation: {
+              'fade-up': 'fadeUp 0.7s cubic-bezier(.22,.68,0,1.2) both',
+              'fade-in': 'fadeIn 0.5s ease both',
+              'float': 'float 6s ease-in-out infinite',
+              'shimmer': 'shimmer 2.5s linear infinite',
+              'glow-pulse': 'glowPulse 3s ease-in-out infinite',
+              'spin-slow': 'spin 8s linear infinite',
+            },
+            keyframes: {
+              fadeUp: { '0%': { opacity: '0', transform: 'translateY(28px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
+              fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
+              float: { '0%,100%': { transform: 'translateY(0px) rotate(-1deg)' }, '50%': { transform: 'translateY(-14px) rotate(1deg)' } },
+              shimmer: { '0%': { backgroundPosition: '-200% 0' }, '100%': { backgroundPosition: '200% 0' } },
+              glowPulse: { '0%,100%': { opacity: '0.5', transform: 'scale(1)' }, '50%': { opacity: '0.9', transform: 'scale(1.08)' } },
             }
           }
         }
       }
     </script>
     <style>
-      .prose h1, .prose h2, .prose h3 { color: #f1f5f9; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.75rem; }
-      .prose p { color: #94a3b8; line-height: 1.6; margin-bottom: 1rem; }
-      .prose ul { color: #94a3b8; list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; }
-      .prose li { margin-bottom: 0.25rem; }
-      .prose code { background-color: rgba(255,255,255,0.1); padding: 0.125rem 0.25rem; border-radius: 0.25rem; font-size: 0.875em; }
+      :root { scroll-behavior: smooth; }
+      * { box-sizing: border-box; }
+
+      /* Prose styles for changelog */
+      .prose h2 { color: #e2e8f0; font-weight: 700; font-size: 1.25rem; margin-top: 2rem; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem; }
+      .prose h2::before { content: ''; display: inline-block; width: 4px; height: 1.25rem; background: linear-gradient(to bottom, #9B8EE8, #534AB7); border-radius: 99px; }
+      .prose h3 { color: #cbd5e1; font-weight: 600; font-size: 1rem; margin-top: 1.25rem; margin-bottom: 0.5rem; }
+      .prose p { color: #94a3b8; line-height: 1.7; margin-bottom: 0.75rem; font-size: 0.9rem; }
+      .prose ul { color: #94a3b8; list-style: none; padding-left: 0; margin-bottom: 1rem; }
+      .prose ul li { padding: 0.3rem 0 0.3rem 1.5rem; font-size: 0.9rem; position: relative; }
+      .prose ul li::before { content: '▸'; position: absolute; left: 0; color: #6B63D4; font-size: 0.75rem; top: 0.4rem; }
+      .prose strong { color: #e2e8f0; font-weight: 600; }
+      .prose code { background: rgba(107,99,212,0.15); color: #9B8EE8; padding: 0.1rem 0.4rem; border-radius: 6px; font-size: 0.8em; font-family: 'SF Mono', 'Fira Code', monospace; }
+
+      /* Animated gradient background */
+      .hero-glow { background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(107,99,212,0.22) 0%, transparent 70%); }
+
+      /* Card hover glow */
+      .feature-card { transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease; }
+      .feature-card:hover { transform: translateY(-4px); box-shadow: 0 20px 60px rgba(107,99,212,0.15); border-color: rgba(107,99,212,0.35); }
+
+      /* Shimmer on CTA */
+      .btn-shimmer { background-size: 200% auto; animation: shimmer 2.5s linear infinite; }
+
+      /* Orbit rings */
+      .orbit-ring { border: 1px solid rgba(107,99,212,0.12); border-radius: 50%; position: absolute; }
+
+      /* Scrollbar */
+      ::-webkit-scrollbar { width: 6px; } 
+      ::-webkit-scrollbar-track { background: transparent; }
+      ::-webkit-scrollbar-thumb { background: rgba(107,99,212,0.4); border-radius: 99px; }
+
+      /* Staggered animation delays */
+      .delay-100 { animation-delay: 0.1s; }
+      .delay-200 { animation-delay: 0.2s; }
+      .delay-300 { animation-delay: 0.3s; }
+      .delay-400 { animation-delay: 0.4s; }
+      .delay-500 { animation-delay: 0.5s; }
+      .delay-600 { animation-delay: 0.6s; }
     </style>
 </head>
-<body class="bg-quill-dark text-slate-100 font-sans min-h-screen flex flex-col relative overflow-x-hidden">
-    
-    <!-- Background glows -->
-    <div class="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-quill-purple/20 rounded-full blur-[120px] pointer-events-none"></div>
-    <div class="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-blue-600/10 rounded-full blur-[120px] pointer-events-none"></div>
+<body class="bg-quill-dark text-slate-100 font-sans min-h-screen flex flex-col overflow-x-hidden selection:bg-quill-purple/30 selection:text-white">
 
-    <main class="flex-1 max-w-4xl w-full mx-auto px-6 py-16 relative z-10">
-        <!-- Header -->
-        <header class="text-center mb-16">
-            <div class="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-quill-purple to-purple-400 rounded-3xl flex items-center justify-center shadow-xl shadow-quill-purple/30 overflow-hidden">
-                <img src="icon.png" alt="Quill Logo" class="w-12 h-12 object-contain">
+    <!-- Top ambient glow -->
+    <div class="fixed inset-0 pointer-events-none z-0">
+        <div class="absolute top-[-30%] left-[-15%] w-[70%] h-[70%] bg-quill-purple/15 rounded-full blur-[160px] animate-glow-pulse"></div>
+        <div class="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-blue-600/8 rounded-full blur-[120px]"></div>
+        <div class="absolute top-[40%] right-[-5%] w-[30%] h-[30%] bg-violet-500/8 rounded-full blur-[100px]"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 w-full backdrop-blur-xl border-b border-white/5 animate-fade-in" style="background: rgba(10,10,16,0.8);">
+        <div class="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-[10px] bg-gradient-to-br from-quill-purple-light to-quill-purple overflow-hidden flex items-center justify-center shadow-lg shadow-quill-purple/30">
+                    <img src="icon.png" alt="Quill" class="w-5 h-5 object-contain">
+                </div>
+                <span class="font-bold text-lg tracking-tight text-white">Quill</span>
             </div>
-            <h1 class="text-5xl font-extrabold tracking-tight mb-4">Quill Extension</h1>
-            <p class="text-xl text-slate-400 max-w-2xl mx-auto">
-                Save your personal data securely on-device, and fill any web form in one click with smart heuristics.
-            </p>
-        </header>
+            <div class="flex items-center gap-3">
+                <a href="#download" class="hidden sm:flex items-center gap-2 px-4 py-2 bg-quill-purple/20 hover:bg-quill-purple/30 text-quill-purple-light rounded-full text-sm font-medium transition-all">
+                    Download
+                </a>
+                <a href="https://github.com/gurukannan22/quill" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/8 rounded-full text-sm font-medium transition-all hover:border-white/15 hover:scale-105">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="text-slate-300">
+                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                    </svg>
+                    GitHub
+                </a>
+            </div>
+        </div>
+    </nav>
 
-        <!-- Downloads -->
-        <div class="bg-quill-card border border-white/10 rounded-3xl p-8 mb-16 shadow-2xl flex flex-col md:flex-row gap-8 items-center">
-            <div class="flex-1">
-                <h2 class="text-2xl font-semibold mb-2">Download & Install</h2>
-                <p class="text-slate-400 text-sm mb-6">Choose your preferred installation method. Currently supported on Chromium-based browsers (Chrome, Edge, Arc, Brave).</p>
-                <div class="flex flex-col sm:flex-row gap-4">
-                    <a href="quill-extension.zip" download class="flex-1 bg-gradient-to-r from-quill-purple to-purple-500 hover:from-quill-purpleHover hover:to-purple-400 text-white font-semibold py-3 px-6 rounded-2xl shadow-lg shadow-quill-purple/20 text-center transition-all active:scale-95 flex items-center justify-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                        Download .ZIP
-                    </a>
-                    <a href="quill-extension.crx" download class="flex-1 bg-white/10 hover:bg-white/15 border border-white/10 text-white font-semibold py-3 px-6 rounded-2xl text-center transition-all active:scale-95 flex items-center justify-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                        Download .CRX
-                    </a>
+    <main class="flex-1 relative z-10">
+
+        <!-- HERO -->
+        <section class="hero-glow max-w-5xl mx-auto px-6 pt-20 pb-16 text-center">
+            <!-- Floating logo with orbit rings -->
+            <div class="relative w-32 h-32 mx-auto mb-10 animate-fade-up" style="animation-delay:0.05s">
+                <!-- Outer orbit ring -->
+                <div class="orbit-ring absolute inset-[-24px] animate-spin-slow" style="animation-direction: reverse;"></div>
+                <!-- Inner orbit ring -->
+                <div class="orbit-ring absolute inset-[-10px] animate-spin-slow" style="animation-duration:5s; border-color: rgba(107,99,212,0.2);"></div>
+                <!-- Glow -->
+                <div class="absolute inset-0 bg-quill-purple/30 rounded-[32px] blur-2xl scale-150 animate-glow-pulse"></div>
+                <!-- Icon -->
+                <div class="relative w-32 h-32 rounded-[32px] bg-gradient-to-br from-quill-purple-light via-quill-purple to-purple-800 flex items-center justify-center shadow-2xl shadow-quill-purple/40 animate-float overflow-hidden">
+                    <img src="icon.png" alt="Quill Logo" class="w-20 h-20 object-contain drop-shadow-xl">
                 </div>
             </div>
-            
-            <div class="w-px h-32 bg-white/10 hidden md:block"></div>
 
-            <div class="flex-1 w-full md:w-auto bg-black/20 rounded-2xl p-5 text-sm text-slate-300">
-                <h3 class="font-semibold text-white mb-2">How to install (.ZIP)</h3>
-                <ol class="list-decimal pl-4 space-y-1.5 text-slate-400">
-                    <li>Extract the downloaded ZIP.</li>
-                    <li>Go to <code class="bg-white/10 px-1.5 py-0.5 rounded text-quill-purpleHover">chrome://extensions</code></li>
-                    <li>Enable <strong>Developer mode</strong> (top right).</li>
-                    <li>Click <strong>Load unpacked</strong> and select the folder.</li>
-                </ol>
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 bg-quill-purple/10 border border-quill-purple/20 rounded-full text-quill-purple-light text-xs font-semibold mb-6 animate-fade-up delay-100">
+                <span class="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>
+                v0.1.0 — Now available
             </div>
-        </div>
 
-        <!-- Changelog -->
-        <div class="mb-12">
-            <div class="flex items-center gap-4 mb-6">
-                <h2 class="text-3xl font-bold">Changelog</h2>
-                <div class="h-px bg-white/10 flex-1"></div>
+            <h1 class="text-5xl md:text-7xl font-black tracking-tight mb-6 animate-fade-up delay-200 leading-[1.05]">
+                <span class="bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-slate-400">Data input,</span><br>
+                <span class="bg-clip-text text-transparent bg-gradient-to-r from-quill-purple-light via-quill-purple to-purple-400">simplified.</span>
+            </h1>
+
+            <p class="text-lg md:text-xl text-slate-400 max-w-xl mx-auto mb-10 leading-relaxed animate-fade-up delay-300">
+                Save profiles. Fill forms. <strong class="text-slate-300 font-medium">One click.</strong> All data stays 100% on your device — no cloud, no accounts, no tracking.
+            </p>
+
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-up delay-400">
+                <a href="#download" class="group flex items-center gap-2.5 px-7 py-3.5 rounded-2xl font-bold text-white text-sm shadow-xl shadow-quill-purple/30 hover:shadow-quill-purple/50 transition-all hover:scale-105 active:scale-95 btn-shimmer" style="background: linear-gradient(135deg, #6B63D4, #9B8EE8, #6B63D4);">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    Download Free
+                </a>
+                <a href="https://github.com/gurukannan22/quill" target="_blank" class="flex items-center gap-2 px-7 py-3.5 rounded-2xl font-semibold text-sm bg-white/5 hover:bg-white/10 border border-white/8 hover:border-white/15 transition-all hover:scale-105">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" class="text-slate-400"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                    View on GitHub
+                </a>
             </div>
-            <div id="changelog-content" class="prose bg-quill-card border border-white/10 rounded-3xl p-8">
-                <p class="animate-pulse text-slate-500">Loading changelog...</p>
+        </section>
+
+        <!-- FEATURES GRID -->
+        <section class="max-w-5xl mx-auto px-6 pb-20">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                <div class="feature-card bg-quill-card border border-quill-border rounded-[24px] p-7 shadow-xl animate-fade-up delay-200">
+                    <div class="w-12 h-12 rounded-[14px] bg-gradient-to-br from-quill-purple/20 to-violet-600/10 flex items-center justify-center mb-5 shadow-inner">
+                        <svg viewBox="0 0 24 24" width="22" height="22" stroke="#9B8EE8" stroke-width="2" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    </div>
+                    <h3 class="font-bold text-lg text-white mb-2">Multiple Profiles</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">Create profiles for Personal, Work, or Freelance. Switch in one tap and fill instantly.</p>
+                </div>
+                <div class="feature-card bg-quill-card border border-quill-border rounded-[24px] p-7 shadow-xl animate-fade-up delay-300">
+                    <div class="w-12 h-12 rounded-[14px] bg-gradient-to-br from-quill-purple/20 to-violet-600/10 flex items-center justify-center mb-5 shadow-inner">
+                        <svg viewBox="0 0 24 24" width="22" height="22" stroke="#9B8EE8" stroke-width="2" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
+                    </div>
+                    <h3 class="font-bold text-lg text-white mb-2">Smart Autofill</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">Intelligent heuristics detect and map form fields — works on any modern SPA or static site.</p>
+                </div>
+                <div class="feature-card bg-quill-card border border-quill-border rounded-[24px] p-7 shadow-xl animate-fade-up delay-400">
+                    <div class="w-12 h-12 rounded-[14px] bg-gradient-to-br from-quill-purple/20 to-violet-600/10 flex items-center justify-center mb-5 shadow-inner">
+                        <svg viewBox="0 0 24 24" width="22" height="22" stroke="#9B8EE8" stroke-width="2" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    </div>
+                    <h3 class="font-bold text-lg text-white mb-2">100% Private</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">Your data never touches a server. Stored locally with <code>chrome.storage.local</code>, encrypted on-device.</p>
+                </div>
             </div>
-        </div>
+        </section>
+
+        <!-- DOWNLOAD -->
+        <section id="download" class="max-w-5xl mx-auto px-6 pb-24">
+            <div class="relative bg-quill-card border border-quill-border rounded-[28px] p-8 md:p-10 shadow-2xl overflow-hidden animate-fade-up delay-200">
+                <!-- Background decoration -->
+                <div class="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-quill-purple/6 to-transparent pointer-events-none"></div>
+                <div class="absolute bottom-0 left-[-20%] w-[40%] h-[40%] bg-quill-purple/6 rounded-full blur-3xl pointer-events-none"></div>
+
+                <div class="relative z-10 flex flex-col md:flex-row gap-10 items-start">
+                    <div class="flex-1">
+                        <p class="text-quill-purple-light text-xs font-bold uppercase tracking-widest mb-3">Get Started</p>
+                        <h2 class="text-3xl font-extrabold mb-3 text-white">Download & Install</h2>
+                        <p class="text-slate-400 text-sm mb-8 leading-relaxed">Works on Chrome, Edge, Brave, and Arc. Choose your preferred installation method below.</p>
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <a href="quill-extension.zip" download class="group flex items-center justify-center gap-2.5 flex-1 py-3.5 px-6 rounded-2xl font-bold text-white text-sm shadow-lg shadow-quill-purple/20 hover:shadow-quill-purple/40 transition-all hover:scale-[1.03] active:scale-95 btn-shimmer" style="background: linear-gradient(135deg, #534AB7, #7F77DD, #534AB7);">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                                Download .ZIP
+                            </a>
+                            <a href="quill-extension.crx" download class="flex items-center justify-center gap-2.5 flex-1 py-3.5 px-6 rounded-2xl font-semibold text-sm bg-white/5 hover:bg-white/10 border border-white/8 hover:border-white/15 transition-all hover:scale-[1.03] active:scale-95">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                Download .CRX
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="w-px hidden md:block self-stretch bg-gradient-to-b from-transparent via-white/10 to-transparent"></div>
+
+                    <div class="flex-1 bg-black/25 rounded-[20px] p-6 border border-white/5">
+                        <h3 class="font-semibold text-white text-sm mb-4 flex items-center gap-2">
+                            <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" class="text-quill-purple-light"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                            Installation steps (.ZIP)
+                        </h3>
+                        <ol class="space-y-2.5 text-slate-400 text-sm">
+                            <li class="flex items-start gap-3">
+                                <span class="w-5 h-5 rounded-full bg-quill-purple/20 text-quill-purple-light text-[10px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">1</span>
+                                Extract the downloaded ZIP file.
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="w-5 h-5 rounded-full bg-quill-purple/20 text-quill-purple-light text-[10px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">2</span>
+                                Navigate to <code class="text-quill-purple-light font-mono text-xs bg-quill-purple/10 px-1.5 py-0.5 rounded-md">chrome://extensions</code>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="w-5 h-5 rounded-full bg-quill-purple/20 text-quill-purple-light text-[10px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">3</span>
+                                Toggle <strong class="text-slate-300">Developer Mode</strong> on (top right).
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="w-5 h-5 rounded-full bg-quill-purple/20 text-quill-purple-light text-[10px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">4</span>
+                                Click <strong class="text-slate-300">Load unpacked</strong> → select the folder.
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CHANGELOG -->
+        <section class="max-w-3xl mx-auto px-6 pb-24">
+            <div class="flex items-center gap-4 mb-8 animate-fade-up delay-200">
+                <div>
+                    <p class="text-quill-purple-light text-xs font-bold uppercase tracking-widest mb-1">What's new</p>
+                    <h2 class="text-2xl font-extrabold text-white">Release Notes</h2>
+                </div>
+                <div class="h-px bg-gradient-to-r from-white/10 to-transparent flex-1"></div>
+                <a href="https://github.com/gurukannan22/quill/releases" target="_blank" class="flex items-center gap-1.5 text-xs text-quill-purple-light hover:text-white transition-colors font-medium shrink-0">
+                    All releases
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                </a>
+            </div>
+            <div id="changelog-content" class="prose bg-quill-card border border-quill-border rounded-[24px] p-8 shadow-xl animate-fade-up delay-300">
+                <div class="flex items-center gap-3 text-slate-500 text-sm">
+                    <svg class="w-4 h-4 animate-spin text-quill-purple" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    Loading changelog...
+                </div>
+            </div>
+        </section>
+
     </main>
 
-    <footer class="py-8 text-center text-slate-500 text-sm border-t border-white/5 relative z-10">
-        <p>Made with ❤️ by gurukannan22</p>
+    <footer class="py-10 text-center relative z-10 border-t border-white/5" style="background: rgba(10,10,16,0.6)">
+        <div class="flex items-center justify-center gap-1.5 text-sm text-slate-500">
+            Made with <span class="text-red-400 animate-pulse">❤️</span> by 
+            <a href="https://github.com/gurukannan22" target="_blank" class="text-slate-400 hover:text-white transition-colors font-semibold ml-0.5">gurukannan22</a>
+        </div>
     </footer>
 
+    <!-- Scroll reveal script -->
     <script>
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animationPlayState = 'running';
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.animate-fade-up').forEach(el => {
+            el.style.animationPlayState = 'paused';
+            observer.observe(el);
+        });
+
+        // Changelog fetch
         fetch('CHANGELOG.md')
-            .then(response => {
-                if (!response.ok) throw new Error('Network response was not ok');
-                return response.text();
-            })
-            .then(text => {
-                document.getElementById('changelog-content').innerHTML = marked.parse(text);
-            })
-            .catch(error => {
-                document.getElementById('changelog-content').innerHTML = '<p>Could not load changelog.</p>';
+            .then(res => { if (!res.ok) throw new Error(); return res.text(); })
+            .then(text => { document.getElementById('changelog-content').innerHTML = marked.parse(text); })
+            .catch(() => {
+                document.getElementById('changelog-content').innerHTML =
+                    '<p class="text-slate-400 text-sm">View the full changelog on <a href="https://github.com/gurukannan22/quill/releases" target="_blank" class="text-quill-purple-light hover:underline font-medium">GitHub Releases ↗</a></p>';
             });
     </script>
 </body>
