@@ -6,7 +6,7 @@ on:
       - main
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -39,12 +39,28 @@ jobs:
           zip -r ../quill-extension.zip .
           cd ..
           
+      - name: Build CRX
+        run: npx -y crx3 dist/ -o quill-extension.crx
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v0.1.0
+          name: Quill Extension v0.1.0
+          files: |
+            quill-extension.zip
+            quill-extension.crx
+          
       - name: Prepare Pages Directory
         run: |
           mkdir -p gh-pages-site
           cp quill-extension.zip gh-pages-site/
+          cp quill-extension.crx gh-pages-site/
           # Copy the template index.html to the site directory
           cp scripts/github-pages.html gh-pages-site/index.html
+          # Copy changelog and versions
+          cp CHANGELOG.md gh-pages-site/ || true
+          cp versions.txt gh-pages-site/ || true
           
       - name: Setup Pages
         uses: actions/configure-pages@v5

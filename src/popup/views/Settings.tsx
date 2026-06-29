@@ -150,9 +150,10 @@ export function Settings({ onBack, onToast }: Props) {
         </section>
 
         {/* Footer */}
-        <p className="text-center text-[11px] text-slate-700 pt-2">
-          Quill v0.1.0 · Data stays on your device
-        </p>
+        <footer className="mt-8 text-center text-xs font-medium text-slate-500">
+        <p className="mb-1">Quill Extension v0.1.0</p>
+        <p>Made with &lt;3 by gurukannan22</p>
+      </footer>
       </main>
     </div>
   );
